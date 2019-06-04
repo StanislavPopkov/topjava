@@ -31,7 +31,6 @@ public class UserMealsUtil {
             mapCalories.put(userMeal.getDateTime().toLocalDate().toString(), caloriesUserMeal);
         }
         for(UserMeal userMeal: mealList){
-            System.out.println(userMeal.getDateTime().toLocalDate().toString());
             if(TimeUtil.isBetween(userMeal.getDateTime().toLocalTime(), startTime, endTime)){
                 String userDate = userMeal.getDateTime().toLocalDate().toString();
                 int userCalories = mapCalories.get(userDate);
