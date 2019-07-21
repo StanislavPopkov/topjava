@@ -1,16 +1,13 @@
 package ru.javawebinar.topjava.util;
 
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.model.MealTo;
+import ru.javawebinar.topjava.to.MealTo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Month;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -51,5 +48,28 @@ public class MealsUtil {
 
     private static MealTo createWithExcess(Meal meal, boolean excess) {
         return new MealTo(meal.getId(), meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
+    }
+
+    public static List<MealTo> getFilteredExceededMY(List<Meal> mealList, LocalDateTime startTime, LocalDateTime endTime, int caloriesPerDay) {
+        Map<LocalDate, Integer> mapCalories = new HashMap<>();
+        for (Meal userMeal : mealList) {
+            int caloriesUserMeal = mapCalories.getOrDefault(userMeal.getDateTime().toLocalDate(), 0) + userMeal.getCalories();
+            mapCalories.put(userMeal.getDateTime().toLocalDate(), caloriesUserMeal);
+        }
+        List<MealTo> listExceed = new ArrayList<>();
+        for (Meal userMeal : mealList) {
+            if (DateTimeUtil.isBetweenDate(userMeal.getDateTime(), startTime, endTime)) {
+                LocalDate userDate = userMeal.getDateTime().toLocalDate();
+                int userCalories = mapCalories.get(userDate);
+                if (userCalories <= caloriesPerDay) {
+                    MealTo mealWithExceed = new MealTo(userMeal.getId(), userMeal.getDateTime(), userMeal.getDescription(), userMeal.getCalories(), false);
+                    listExceed.add(mealWithExceed);
+                } else {
+                    MealTo mealWithExceed = new MealTo(userMeal.getId(), userMeal.getDateTime(), userMeal.getDescription(), userMeal.getCalories(), true);
+                    listExceed.add(mealWithExceed);
+                }
+            }
+        }
+        return listExceed;
     }
 }
