@@ -1,5 +1,7 @@
 package ru.javawebinar.topjava.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.javawebinar.topjava.model.Meal;
@@ -19,6 +21,7 @@ import java.util.List;
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFoundWithId;
 @Service
 public class MealServiceImpl implements MealService {
+    private static final Logger log = LoggerFactory.getLogger(MealServiceImpl.class);
 
     private MealRepository repository;
     @Autowired
@@ -28,16 +31,19 @@ public class MealServiceImpl implements MealService {
 
     @Override
     public void create(Meal meal) {
+        log.info("Create meal", meal);
         repository.save(meal);
     }
 
     @Override
     public void delete(int id) throws NotFoundException {
+        log.info("Delete meal");
         repository.delete(id);
     }
 
     @Override
     public MealTo get(int id, int caloriesUser) throws NotFoundException {
+        log.info("Get 1 meal");
         Meal meal = repository.get(id);
         checkNotFoundWithId(meal, id);
 
@@ -52,6 +58,7 @@ public class MealServiceImpl implements MealService {
 
     @Override
     public void update(Meal meal) {
+        log.info("Update meal", meal);
         Meal mealTest = repository.save(meal);
         if(mealTest == null) throw new NotFoundException("Updating meal not found in repository.");
     }
@@ -59,6 +66,7 @@ public class MealServiceImpl implements MealService {
     @Override
 
     public List<MealTo> getAll(int userId, int caloriesUser) {
+        log.info("GetAll meal", userId, caloriesUser);
         Collection<Meal> allMeals = repository.getAll();
         if(allMeals.isEmpty() != true ){
             List<Meal> listUser = new ArrayList<>();
@@ -75,6 +83,7 @@ public class MealServiceImpl implements MealService {
 
     @Override
     public List<MealTo> getAllFiltered(int userId, int caloriesUser, LocalDateTime start, LocalDateTime end) {
+        log.info("GetAll meal", userId, caloriesUser, start, end);
         Collection<Meal> allMeals = repository.getAll();
         if(allMeals.isEmpty() != true ){
             List<Meal> listUser = new ArrayList<>();

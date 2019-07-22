@@ -20,5 +20,6 @@ public class SpringMain {
             System.out.println(appCtx.toString());
         }
         System.out.println(SpringMain.BOXWIDTH + 1);
+        System.out.println(SpringMain.BOXWIDTH);
     }
 }
