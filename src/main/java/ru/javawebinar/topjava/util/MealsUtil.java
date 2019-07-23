@@ -1,7 +1,8 @@
 package ru.javawebinar.topjava.util;
 
+import org.springframework.lang.Nullable;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.model.MealTo;
+import ru.javawebinar.topjava.to.MealTo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,7 +33,7 @@ public class MealsUtil {
         return getFilteredWithExcess(meals, caloriesPerDay, meal -> true);
     }
 
-    public static List<MealTo> getFilteredWithExcess(Collection<Meal> meals, int caloriesPerDay, LocalTime startTime, LocalTime endTime) {
+    public static List<MealTo> getFilteredWithExcess(Collection<Meal> meals, int caloriesPerDay, @Nullable LocalTime startTime, @Nullable LocalTime endTime) {
         return getFilteredWithExcess(meals, caloriesPerDay, meal -> Util.isBetween(meal.getTime(), startTime, endTime));
     }
 
