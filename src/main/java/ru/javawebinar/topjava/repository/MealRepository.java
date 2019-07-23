@@ -5,6 +5,7 @@ import ru.javawebinar.topjava.model.Meal;
 import java.util.Collection;
 
 public interface MealRepository {
+    // null if not found, when updated
     Meal save(Meal meal);
 
     // false if not found
