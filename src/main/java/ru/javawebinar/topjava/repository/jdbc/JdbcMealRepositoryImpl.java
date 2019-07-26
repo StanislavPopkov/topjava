@@ -50,8 +50,8 @@ public class JdbcMealRepositoryImpl implements MealRepository {
         if (meal.isNew()) {
             Number newKey = insertMeal.executeAndReturnKey(map);
         } else if (namedParameterJdbcTemplate.update(
-                "UPDATE meals SET datetime=:datetime, description=:description, calories=:calories, " +
-                        " WHERE id=:id", map) == 0) {
+                "UPDATE meals SET datetime=:datetime, description=:description, calories=:calories WHERE id=:id",
+                map) == 0) {
             return null;
         }
         return meal;
@@ -74,9 +74,18 @@ public class JdbcMealRepositoryImpl implements MealRepository {
     }
 
     @Override
-    public List<Meal> getBetween(LocalDateTime startDate, LocalDateTime endDate, int userId) {
+    public List<Meal> getBetween(LocalDateTime startDate, LocalDateTime endDate, int userid) {
         Timestamp startD = Timestamp.valueOf(startDate);
         Timestamp endD = Timestamp.valueOf(endDate);
-        return jdbcTemplate.query("SELECT * FROM meals WHERE userid=? AND timestamp > ? AND timestamp < ?  ORDER BY datetime DESC", ROW_MAPPER, userId, startD, endD);
+        //jdbcTemplate.query("SELECT * FROM meals WHERE userid=? AND datetime > ? AND datetime < ?  ORDER BY datetime DESC", userId, startD, endD, ROW_MAPPER);
+        MapSqlParameterSource map = new MapSqlParameterSource()
+                .addValue("userid", userid)
+                .addValue("startD", startD)
+                .addValue("endD", endD);
+        //SELECT * FROM meals WHERE userid=100001 AND datetime>'2016-06-21 18:10:25' AND datetime<'2016-07-25 18:10:26' ORDER BY datetime DESC;
+        return namedParameterJdbcTemplate.query("SELECT * FROM meals WHERE userid=:userid AND datetime>:startD AND datetime<:endD ORDER BY datetime DESC", map, ROW_MAPPER);
+
+
+
     }
 }
