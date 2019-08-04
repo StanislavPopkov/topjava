@@ -1,0 +1,190 @@
+Index: src/test/java/ru/javawebinar/topjava/web/user/InMemoryAdminRestControllerTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/java/ru/javawebinar/topjava/web/user/InMemoryAdminRestControllerTest.java	(revision 789e353867bc548046d013e8690465d8763d4098)
++++ src/test/java/ru/javawebinar/topjava/web/user/InMemoryAdminRestControllerTest.java	(date 1562187220612)
+@@ -40,8 +40,8 @@
+     public void delete() throws Exception {
+         controller.delete(UserTestData.USER_ID);
+         Collection<User> users = controller.getAll();
+-        Assert.assertEquals(users.size(), 1);
+-        Assert.assertEquals(users.iterator().next(), ADMIN);
++        Assert.assertEquals(1, users.size());
++        Assert.assertEquals(ADMIN, users.iterator().next());
+     }
+ 
+     @Test(expected = NotFoundException.class)
+Index: src/test/java/ru/javawebinar/topjava/web/user/InMemoryAdminRestControllerSpringTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/java/ru/javawebinar/topjava/web/user/InMemoryAdminRestControllerSpringTest.java	(revision 789e353867bc548046d013e8690465d8763d4098)
++++ src/test/java/ru/javawebinar/topjava/web/user/InMemoryAdminRestControllerSpringTest.java	(date 1562187220606)
+@@ -35,8 +35,8 @@
+     public void delete() throws Exception {
+         controller.delete(UserTestData.USER_ID);
+         Collection<User> users = controller.getAll();
+-        Assert.assertEquals(users.size(), 1);
+-        Assert.assertEquals(users.iterator().next(), ADMIN);
++        Assert.assertEquals(1, users.size());
++        Assert.assertEquals(ADMIN, users.iterator().next());
+     }
+ 
+     @Test(expected = NotFoundException.class)
+Index: src/test/java/ru/javawebinar/topjava/service/UserServiceTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/java/ru/javawebinar/topjava/service/UserServiceTest.java	(revision 789e353867bc548046d013e8690465d8763d4098)
++++ src/test/java/ru/javawebinar/topjava/service/UserServiceTest.java	(date 1562191629792)
+@@ -2,7 +2,6 @@
+ 
+ import org.junit.Test;
+ import org.junit.runner.RunWith;
+-import org.slf4j.bridge.SLF4JBridgeHandler;
+ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.dao.DataAccessException;
+ import org.springframework.test.context.ContextConfiguration;
+Index: src/test/java/ru/javawebinar/topjava/service/MealServiceTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/java/ru/javawebinar/topjava/service/MealServiceTest.java	(revision 789e353867bc548046d013e8690465d8763d4098)
++++ src/test/java/ru/javawebinar/topjava/service/MealServiceTest.java	(date 1562191629777)
+@@ -2,7 +2,6 @@
+ 
+ import org.junit.Test;
+ import org.junit.runner.RunWith;
+-import org.slf4j.bridge.SLF4JBridgeHandler;
+ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.test.context.ContextConfiguration;
+ import org.springframework.test.context.jdbc.Sql;
+Index: src/main/java/ru/javawebinar/topjava/web/user/AbstractUserController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ru/javawebinar/topjava/web/user/AbstractUserController.java	(revision 789e353867bc548046d013e8690465d8763d4098)
++++ src/main/java/ru/javawebinar/topjava/web/user/AbstractUserController.java	(date 1562187029470)
+@@ -15,24 +15,13 @@
+     protected final Logger log = LoggerFactory.getLogger(getClass());
+ 
+     @Autowired
+-    private UserService service;
+-
+-    public List<User> getAll() {
+-        log.info("getAll");
+-        return service.getAll();
+-    }
++    protected UserService service;
+ 
+     public User get(int id) {
+         log.info("get {}", id);
+         return service.get(id);
+     }
+ 
+-    public User create(User user) {
+-        log.info("create {}", user);
+-        checkNew(user);
+-        return service.create(user);
+-    }
+-
+     public void delete(int id) {
+         log.info("delete {}", id);
+         service.delete(id);
+@@ -43,9 +32,4 @@
+         assureIdConsistent(user, id);
+         service.update(user);
+     }
+-
+-    public User getByMail(String email) {
+-        log.info("getByEmail {}", email);
+-        return service.getByEmail(email);
+-    }
+ }
+\ No newline at end of file
+Index: .travis.yml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .travis.yml	(revision 789e353867bc548046d013e8690465d8763d4098)
++++ .travis.yml	(date 1562191592852)
+@@ -1,6 +1,6 @@
+ # https://docs.travis-ci.com/user/languages/java/
+ language: java
+-jdk: oraclejdk8
++jdk: openjdk8
+ 
+ #https://dzone.com/articles/travis-ci-tutorial-java-projects
+ cache:
+Index: src/main/java/ru/javawebinar/topjava/web/user/AdminRestController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ru/javawebinar/topjava/web/user/AdminRestController.java	(revision 789e353867bc548046d013e8690465d8763d4098)
++++ src/main/java/ru/javawebinar/topjava/web/user/AdminRestController.java	(date 1562187029464)
+@@ -5,12 +5,14 @@
+ 
+ import java.util.List;
+ 
++import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
++
+ @Controller
+ public class AdminRestController extends AbstractUserController {
+ 
+-    @Override
+     public List<User> getAll() {
+-        return super.getAll();
++        log.info("getAll");
++        return service.getAll();
+     }
+ 
+     @Override
+@@ -18,9 +20,10 @@
+         return super.get(id);
+     }
+ 
+-    @Override
+     public User create(User user) {
+-        return super.create(user);
++        log.info("create {}", user);
++        checkNew(user);
++        return service.create(user);
+     }
+ 
+     @Override
+@@ -33,8 +36,8 @@
+         super.update(user, id);
+     }
+ 
+-    @Override
+     public User getByMail(String email) {
+-        return super.getByMail(email);
++        log.info("getByEmail {}", email);
++        return service.getByEmail(email);
+     }
+ }
+\ No newline at end of file
+Index: src/main/resources/spring/spring-app.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/resources/spring/spring-app.xml	(revision 789e353867bc548046d013e8690465d8763d4098)
++++ src/main/resources/spring/spring-app.xml	(date 1562187220600)
+@@ -7,7 +7,7 @@
+ <!--
+     <bean class="ru.javawebinar.topjava.repository.inmemory.InMemoryUserRepository"/>
+ 
+-    <bean class="ru.javawebinar.topjava.service.UserServiceImpl">
++    <bean class="ru.javawebinar.topjava.service.UserService">
+         <constructor-arg name="repository" ref="inMemoryUserRepository"/>
+     </bean>
+ -->

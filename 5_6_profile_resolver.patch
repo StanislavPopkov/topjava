@@ -1,0 +1,98 @@
+Index: src/test/java/ru/javawebinar/topjava/ActiveDbProfileResolver.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/java/ru/javawebinar/topjava/ActiveDbProfileResolver.java	(date 1562192280028)
++++ src/test/java/ru/javawebinar/topjava/ActiveDbProfileResolver.java	(date 1562192280028)
+@@ -0,0 +1,12 @@
++package ru.javawebinar.topjava;
++
++import org.springframework.test.context.ActiveProfilesResolver;
++
++//http://stackoverflow.com/questions/23871255/spring-profiles-simple-example-of-activeprofilesresolver
++public class ActiveDbProfileResolver implements ActiveProfilesResolver {
++
++    @Override
++    public String[] resolve(Class<?> aClass) {
++        return new String[]{Profiles.getActiveDbProfile()};
++    }
++}
+\ No newline at end of file
+Index: src/main/java/ru/javawebinar/topjava/Profiles.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ru/javawebinar/topjava/Profiles.java	(date 1562192265000)
++++ src/main/java/ru/javawebinar/topjava/Profiles.java	(date 1562192280000)
+@@ -11,5 +11,18 @@
+             POSTGRES_DB = "postgres",
+             HSQL_DB = "hsqldb";
+ 
+-    public static final String ACTIVE_DB = POSTGRES_DB;
++    //  Get DB profile depending of DB driver in classpath
++    public static String getActiveDbProfile() {
++        try {
++            Class.forName("org.postgresql.Driver");
++            return POSTGRES_DB;
++        } catch (ClassNotFoundException ex) {
++            try {
++                Class.forName("org.hsqldb.jdbcDriver");
++                return Profiles.HSQL_DB;
++            } catch (ClassNotFoundException e) {
++                throw new IllegalStateException("Could not find DB driver");
++            }
++        }
++    }
+ }
+Index: src/test/java/ru/javawebinar/topjava/service/UserServiceTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/java/ru/javawebinar/topjava/service/UserServiceTest.java	(date 1562192265000)
++++ src/test/java/ru/javawebinar/topjava/service/UserServiceTest.java	(date 1562192280019)
+@@ -9,7 +9,7 @@
+ import org.springframework.test.context.jdbc.Sql;
+ import org.springframework.test.context.jdbc.SqlConfig;
+ import org.springframework.test.context.junit4.SpringRunner;
+-import ru.javawebinar.topjava.Profiles;
++import ru.javawebinar.topjava.ActiveDbProfileResolver;
+ import ru.javawebinar.topjava.model.Role;
+ import ru.javawebinar.topjava.model.User;
+ import ru.javawebinar.topjava.util.exception.NotFoundException;
+@@ -26,7 +26,7 @@
+ })
+ @RunWith(SpringRunner.class)
+ @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
+-@ActiveProfiles(Profiles.ACTIVE_DB)
++@ActiveProfiles(resolver = ActiveDbProfileResolver.class)
+ public class UserServiceTest {
+ 
+     @Autowired
+Index: src/test/java/ru/javawebinar/topjava/service/MealServiceTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/java/ru/javawebinar/topjava/service/MealServiceTest.java	(date 1562192265000)
++++ src/test/java/ru/javawebinar/topjava/service/MealServiceTest.java	(date 1562192280010)
+@@ -14,7 +14,7 @@
+ import org.springframework.test.context.jdbc.Sql;
+ import org.springframework.test.context.jdbc.SqlConfig;
+ import org.springframework.test.context.junit4.SpringRunner;
+-import ru.javawebinar.topjava.Profiles;
++import ru.javawebinar.topjava.ActiveDbProfileResolver;
+ import ru.javawebinar.topjava.model.Meal;
+ import ru.javawebinar.topjava.util.exception.NotFoundException;
+ 
+@@ -33,7 +33,7 @@
+ })
+ @RunWith(SpringRunner.class)
+ @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
+-@ActiveProfiles(Profiles.ACTIVE_DB)
++@ActiveProfiles(resolver = ActiveDbProfileResolver.class)
+ public class MealServiceTest {
+     private static final Logger log = getLogger("result");
+ 

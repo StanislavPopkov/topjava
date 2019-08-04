@@ -1,0 +1,296 @@
+Index: src/main/java/ru/javawebinar/topjava/repository/datajpa/DataJpaUserRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ru/javawebinar/topjava/repository/datajpa/DataJpaUserRepository.java	(date 1562192678202)
++++ src/main/java/ru/javawebinar/topjava/repository/datajpa/DataJpaUserRepository.java	(date 1562192678202)
+@@ -0,0 +1,42 @@
++package ru.javawebinar.topjava.repository.datajpa;
++
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.data.domain.Sort;
++import org.springframework.stereotype.Repository;
++import ru.javawebinar.topjava.model.User;
++import ru.javawebinar.topjava.repository.UserRepository;
++
++import java.util.List;
++
++@Repository
++public class DataJpaUserRepository implements UserRepository {
++    private static final Sort SORT_NAME_EMAIL = new Sort(Sort.Direction.ASC, "name", "email");
++
++    @Autowired
++    private CrudUserRepository crudRepository;
++
++    @Override
++    public User save(User user) {
++        return crudRepository.save(user);
++    }
++
++    @Override
++    public boolean delete(int id) {
++        return crudRepository.delete(id) != 0;
++    }
++
++    @Override
++    public User get(int id) {
++        return crudRepository.findById(id).orElse(null);
++    }
++
++    @Override
++    public User getByEmail(String email) {
++        return crudRepository.getByEmail(email);
++    }
++
++    @Override
++    public List<User> getAll() {
++        return crudRepository.findAll(SORT_NAME_EMAIL);
++    }
++}
+Index: src/main/java/ru/javawebinar/topjava/repository/datajpa/CrudMealRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ru/javawebinar/topjava/repository/datajpa/CrudMealRepository.java	(date 1562192397438)
++++ src/main/java/ru/javawebinar/topjava/repository/datajpa/CrudMealRepository.java	(date 1562192397438)
+@@ -0,0 +1,7 @@
++package ru.javawebinar.topjava.repository.datajpa;
++
++import org.springframework.data.jpa.repository.JpaRepository;
++import ru.javawebinar.topjava.model.Meal;
++
++public interface CrudMealRepository extends JpaRepository<Meal, Integer> {
++}
+Index: src/main/java/ru/javawebinar/topjava/repository/datajpa/DataJpaMealRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ru/javawebinar/topjava/repository/datajpa/DataJpaMealRepository.java	(date 1562192678198)
++++ src/main/java/ru/javawebinar/topjava/repository/datajpa/DataJpaMealRepository.java	(date 1562192678198)
+@@ -0,0 +1,41 @@
++package ru.javawebinar.topjava.repository.datajpa;
++
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.stereotype.Repository;
++import ru.javawebinar.topjava.model.Meal;
++import ru.javawebinar.topjava.repository.MealRepository;
++
++import java.time.LocalDateTime;
++import java.util.List;
++
++@Repository
++public class DataJpaMealRepository implements MealRepository {
++
++    @Autowired
++    private CrudMealRepository crudRepository;
++
++    @Override
++    public Meal save(Meal meal, int userId) {
++        return null;
++    }
++
++    @Override
++    public boolean delete(int id, int userId) {
++        return false;
++    }
++
++    @Override
++    public Meal get(int id, int userId) {
++        return null;
++    }
++
++    @Override
++    public List<Meal> getAll(int userId) {
++        return null;
++    }
++
++    @Override
++    public List<Meal> getBetween(LocalDateTime startDate, LocalDateTime endDate, int userId) {
++        return null;
++    }
++}
+Index: src/main/java/ru/javawebinar/topjava/repository/datajpa/CrudUserRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ru/javawebinar/topjava/repository/datajpa/CrudUserRepository.java	(date 1562192710910)
++++ src/main/java/ru/javawebinar/topjava/repository/datajpa/CrudUserRepository.java	(date 1562192710910)
+@@ -0,0 +1,19 @@
++package ru.javawebinar.topjava.repository.datajpa;
++
++import org.springframework.data.jpa.repository.JpaRepository;
++import org.springframework.data.jpa.repository.Modifying;
++import org.springframework.data.jpa.repository.Query;
++import org.springframework.data.repository.query.Param;
++import org.springframework.transaction.annotation.Transactional;
++import ru.javawebinar.topjava.model.User;
++
++@Transactional(readOnly = true)
++public interface CrudUserRepository extends JpaRepository<User, Integer> {
++    @Transactional
++    @Modifying
++//    @Query(name = User.DELETE)
++    @Query("DELETE FROM User u WHERE u.id=:id")
++    int delete(@Param("id") int id);
++
++    User getByEmail(String email);
++}
+Index: src/main/java/ru/javawebinar/topjava/Profiles.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ru/javawebinar/topjava/Profiles.java	(date 1562192377000)
++++ src/main/java/ru/javawebinar/topjava/Profiles.java	(date 1562192397466)
+@@ -3,9 +3,10 @@
+ public class Profiles {
+     public static final String
+             JDBC = "jdbc",
+-            JPA = "jpa";
++            JPA = "jpa",
++            DATAJPA = "datajpa";
+ 
+-    public static final String REPOSITORY_IMPLEMENTATION = JPA;
++    public static final String REPOSITORY_IMPLEMENTATION = DATAJPA;
+ 
+     public static final String
+             POSTGRES_DB = "postgres",
+Index: src/main/java/ru/javawebinar/topjava/model/AbstractBaseEntity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ru/javawebinar/topjava/model/AbstractBaseEntity.java	(date 1562192377000)
++++ src/main/java/ru/javawebinar/topjava/model/AbstractBaseEntity.java	(date 1562192397432)
+@@ -1,13 +1,14 @@
+ package ru.javawebinar.topjava.model;
+ 
+ import org.hibernate.Hibernate;
++import org.springframework.data.domain.Persistable;
+ 
+ import javax.persistence.*;
+ 
+ @MappedSuperclass
+ // http://stackoverflow.com/questions/594597/hibernate-annotations-which-is-better-field-or-property-access
+ @Access(AccessType.FIELD)
+-public abstract class AbstractBaseEntity {
++public abstract class AbstractBaseEntity implements Persistable<Integer> {
+     public static final int START_SEQ = 100000;
+ 
+     @Id
+@@ -29,10 +30,12 @@
+         this.id = id;
+     }
+ 
++    @Override
+     public Integer getId() {
+         return id;
+     }
+ 
++    @Override
+     public boolean isNew() {
+         return this.id == null;
+     }
+Index: src/main/resources/spring/spring-db.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/resources/spring/spring-db.xml	(date 1562192377000)
++++ src/main/resources/spring/spring-db.xml	(date 1562192397476)
+@@ -4,17 +4,22 @@
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+        xmlns:tx="http://www.springframework.org/schema/tx"
++       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+-       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
++       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
++       http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+ 
+     <!-- Change DB by comment/uncomment property-placeholder -->
+ 
+     <context:property-placeholder location="classpath:db/postgres.properties" system-properties-mode="OVERRIDE"/>
+ <!--    <context:property-placeholder location="classpath:db/hsqldb.properties" system-properties-mode="OVERRIDE"/>-->
+ 
+-    <context:component-scan base-package="ru.javawebinar.**.repository.jpa"/>
++    <!--<context:component-scan base-package="ru.javawebinar.**.repository.jpa"/>-->
++
++    <context:component-scan base-package="ru.javawebinar.**.repository.datajpa"/>
++    <jpa:repositories base-package="ru.javawebinar.**.repository.datajpa"/>
+ 
+     <jdbc:initialize-database data-source="dataSource" enabled="${database.init}">
+         <jdbc:script location="classpath:db/${jdbc.initLocation}"/>
+@@ -90,4 +95,11 @@
+               p:username="${database.username}"
+               p:password="${database.password}"/>
+     </beans>
++
++    <beans profile="jdbc">
++    </beans>
++    <beans profile="jpa">
++    </beans>
++    <beans profile="datajpa">
++    </beans>
+ </beans>
+\ No newline at end of file
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- pom.xml	(date 1562192377000)
++++ pom.xml	(date 1562192533919)
+@@ -17,6 +17,7 @@
+         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+ 
+         <spring.version>5.1.7.RELEASE</spring.version>
++        <spring-data-jpa.version>2.1.9.RELEASE</spring-data-jpa.version>
+         <tomcat.version>9.0.21</tomcat.version>
+ 
+         <!-- Logging -->
+@@ -84,12 +85,11 @@
+         <dependency>
+             <groupId>org.springframework</groupId>
+             <artifactId>spring-context</artifactId>
+-            <version>${spring.version}</version>
+         </dependency>
+         <dependency>
+-            <groupId>org.springframework</groupId>
+-            <artifactId>spring-orm</artifactId>
+-            <version>${spring.version}</version>
++            <groupId>org.springframework.data</groupId>
++            <artifactId>spring-data-jpa</artifactId>
++            <version>${spring-data-jpa.version}</version>
+         </dependency>
+ 
+         <!--- ORM -->
+@@ -136,7 +136,6 @@
+         <dependency>
+             <groupId>org.springframework</groupId>
+             <artifactId>spring-test</artifactId>
+-            <version>${spring.version}</version>
+             <scope>test</scope>
+         </dependency>
+         <dependency>
+@@ -187,5 +186,14 @@
+     </profiles>
+ 
+     <dependencyManagement>
++        <dependencies>
++            <dependency>
++                <groupId>org.springframework</groupId>
++                <artifactId>spring-framework-bom</artifactId>
++                <version>${spring.version}</version>
++                <type>pom</type>
++                <scope>import</scope>
++            </dependency>
++        </dependencies>
+     </dependencyManagement>
+ </project>

@@ -1,0 +1,66 @@
+Index: src/main/resources/logback.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/resources/logback.xml	(date 1562190388000)
++++ src/main/resources/logback.xml	(date 1562190538282)
+@@ -16,7 +16,7 @@
+     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+         <encoder>
+             <charset>UTF-8</charset>
+-            <pattern>%d{HH:mm:ss.SSS} %-5level %class{50}.%M:%L - %msg%n</pattern>
++            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %cyan(%class{50}.%M:%L) - %msg%n</pattern>
+         </encoder>
+     </appender>
+ 
+Index: src/test/java/ru/javawebinar/topjava/service/MealServiceTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/java/ru/javawebinar/topjava/service/MealServiceTest.java	(date 1562190388000)
++++ src/test/java/ru/javawebinar/topjava/service/MealServiceTest.java	(date 1562190538298)
+@@ -32,7 +32,7 @@
+ @RunWith(SpringRunner.class)
+ @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
+ public class MealServiceTest {
+-    private static final Logger log = getLogger(MealServiceTest.class);
++    private static final Logger log = getLogger("result");
+ 
+     private static StringBuilder results = new StringBuilder();
+ 
+Index: src/test/resources/logback-test.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/resources/logback-test.xml	(date 1562190388000)
++++ src/test/resources/logback-test.xml	(date 1562190538307)
+@@ -7,12 +7,23 @@
+     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+         <encoder>
+             <charset>UTF-8</charset>
+-            <pattern>%d{HH:mm:ss.SSS} %-5level %class{50}.%M:%L - %msg%n</pattern>
++            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %cyan(%class{50}.%M:%L) - %msg%n</pattern>
++        </encoder>
++    </appender>
++
++    <appender name="result" class="ch.qos.logback.core.ConsoleAppender">
++        <encoder>
++            <charset>UTF-8</charset>
++            <pattern>%magenta(%msg%n)</pattern>
+         </encoder>
+     </appender>
++    <logger name="result" level="INFO" additivity="false">
++        <appender-ref ref="result"/>
++    </logger>
+ 
+-    <logger name="org.postgresql" level="debug"/>
+-    <logger name="org.springframework.jdbc" level="debug"/>
++    <!--<logger name="org.postgresql" level="debug"/>-->
++    <!--<logger name="org.springframework.jdbc" level="debug"/>-->
++
+     <logger name="ru.javawebinar.topjava" level="debug"/>
+ 
+     <root level="INFO">

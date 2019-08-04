@@ -1,0 +1,208 @@
+Index: src/main/resources/spring/spring-tools.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/resources/spring/spring-tools.xml	(date 1562193006477)
++++ src/main/resources/spring/spring-tools.xml	(date 1562193006477)
+@@ -0,0 +1,22 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<beans xmlns="http://www.springframework.org/schema/beans"
++       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++       xmlns:cache="http://www.springframework.org/schema/cache"
++       xmlns:p="http://www.springframework.org/schema/p"
++       xsi:schemaLocation="http://www.springframework.org/schema/beans
++         http://www.springframework.org/schema/beans/spring-beans.xsd
++         http://www.springframework.org/schema/cache
++         http://www.springframework.org/schema/cache/spring-cache.xsd">
++
++    <!-- enables scanning for @Cacheable annotation -->
++    <cache:annotation-driven cache-manager="ehCacheManager"/>
++
++    <!--https://imhoratiu.wordpress.com/2017/01/26/spring-4-with-ehcache-3-how-to/-->
++    <bean id="ehCacheManager" class="org.springframework.cache.jcache.JCacheCacheManager">
++        <property name="cacheManager">
++            <bean class="org.springframework.cache.jcache.JCacheManagerFactoryBean"
++                  p:cacheManagerUri="classpath:cache/ehcache.xml"/>
++        </property>
++    </bean>
++
++</beans>
+\ No newline at end of file
+Index: src/main/resources/cache/ehcache.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/resources/cache/ehcache.xml	(date 1562193006460)
++++ src/main/resources/cache/ehcache.xml	(date 1562193006460)
+@@ -0,0 +1,25 @@
++<config xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
++        xmlns='http://www.ehcache.org/v3'
++        xsi:schemaLocation="http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.0.xsd">
++
++    <!--http://www.ehcache.org/documentation/3.4/xml.html-->
++    <!--http://www.ehcache.org/documentation/3.1/107.html#supplement-jsr-107-configurations-->
++
++    <!--<persistence directory="${user.home}/cache-data"/>-->
++
++    <cache-template name="expiryCache">
++        <expiry>
++            <ttl unit="minutes">5</ttl>
++        </expiry>
++        <heap unit="entries">5000</heap>
++    </cache-template>
++
++    <cache-template name="singleNonExpiryCache">
++        <expiry>
++            <none/>
++        </expiry>
++        <heap>1</heap>
++    </cache-template>
++
++    <cache alias="users" uses-template="singleNonExpiryCache"/>
++</config>
+Index: src/test/java/ru/javawebinar/topjava/service/UserServiceTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/java/ru/javawebinar/topjava/service/UserServiceTest.java	(date 1562192901000)
++++ src/test/java/ru/javawebinar/topjava/service/UserServiceTest.java	(date 1562193762890)
+@@ -1,8 +1,10 @@
+ package ru.javawebinar.topjava.service;
+ 
++import org.junit.Before;
+ import org.junit.Test;
+ import org.junit.runner.RunWith;
+ import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.cache.CacheManager;
+ import org.springframework.dao.DataAccessException;
+ import org.springframework.test.context.ActiveProfiles;
+ import org.springframework.test.context.ContextConfiguration;
+@@ -32,6 +34,14 @@
+     @Autowired
+     private UserService service;
+ 
++    @Autowired
++    private CacheManager cacheManager;
++
++    @Before
++    public void setUp() throws Exception {
++        cacheManager.getCache("users").clear();
++    }
++
+     @Test
+     public void create() throws Exception {
+         User newUser = new User(null, "New", "new@gmail.com", "newPass", 1555, false, new Date(), Collections.singleton(Role.ROLE_USER));
+Index: src/main/java/ru/javawebinar/topjava/service/UserService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/ru/javawebinar/topjava/service/UserService.java	(date 1562192901000)
++++ src/main/java/ru/javawebinar/topjava/service/UserService.java	(date 1562193006427)
+@@ -1,6 +1,8 @@
+ package ru.javawebinar.topjava.service;
+ 
+ import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.cache.annotation.CacheEvict;
++import org.springframework.cache.annotation.Cacheable;
+ import org.springframework.stereotype.Service;
+ import org.springframework.util.Assert;
+ import ru.javawebinar.topjava.model.User;
+@@ -22,11 +24,13 @@
+         this.repository = repository;
+     }
+ 
++    @CacheEvict(value = "users", allEntries = true)
+     public User create(User user) {
+         Assert.notNull(user, "user must not be null");
+         return repository.save(user);
+     }
+ 
++    @CacheEvict(value = "users", allEntries = true)
+     public void delete(int id) throws NotFoundException {
+         checkNotFoundWithId(repository.delete(id), id);
+     }
+@@ -40,10 +44,12 @@
+         return checkNotFound(repository.getByEmail(email), "email=" + email);
+     }
+ 
++    @Cacheable("users")
+     public List<User> getAll() {
+         return repository.getAll();
+     }
+ 
++    @CacheEvict(value = "users", allEntries = true)
+     public void update(User user) throws NotFoundException {
+         Assert.notNull(user, "user must not be null");
+         checkNotFoundWithId(repository.save(user), user.getId());
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- pom.xml	(date 1562192901000)
++++ pom.xml	(date 1562193684750)
+@@ -33,6 +33,9 @@
+         <hibernate.version>5.4.3.Final</hibernate.version>
+         <hibernate-validator.version>6.0.17.Final</hibernate-validator.version>
+         <javax-el.version>3.0.1-b11</javax-el.version>
++
++        <!--Tools-->
++        <ehcache.version>3.7.1</ehcache.version>
+     </properties>
+ 
+     <build>
+@@ -84,7 +87,7 @@
+         <!-- Spring -->
+         <dependency>
+             <groupId>org.springframework</groupId>
+-            <artifactId>spring-context</artifactId>
++            <artifactId>spring-context-support</artifactId>
+         </dependency>
+         <dependency>
+             <groupId>org.springframework.data</groupId>
+@@ -111,6 +114,26 @@
+             <version>${javax-el.version}</version>
+             <scope>provided</scope>
+         </dependency>
++
++        <!-- Cache -->
++        <dependency>
++            <groupId>javax.cache</groupId>
++            <artifactId>cache-api</artifactId>
++            <version>1.1.0</version>
++        </dependency>
++        <dependency>
++            <groupId>org.ehcache</groupId>
++            <artifactId>ehcache</artifactId>
++<!--            <scope>runtime</scope>-->
++            <version>${ehcache.version}</version>
++        </dependency>
++
++        <!--https://medium.com/criciumadev/its-time-migrating-to-java-11-5eb3868354f9-->
++        <dependency>
++            <groupId>org.glassfish.jaxb</groupId>
++            <artifactId>jaxb-runtime</artifactId>
++            <version>2.4.0-b180830.0438</version>
++        </dependency>
+ 
+         <!--Web-->
+         <dependency>
+Index: src/main/resources/spring/spring-app.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/resources/spring/spring-app.xml	(date 1562192901000)
++++ src/main/resources/spring/spring-app.xml	(date 1562193006468)
+@@ -11,6 +11,7 @@
+         <constructor-arg name="repository" ref="inMemoryUserRepository"/>
+     </bean>
+ -->
++    <import resource="spring-tools.xml"/>
+ 
+     <!-- Not necessary, already included with component-scan -->
+     <!--<context:annotation-config/>-->
