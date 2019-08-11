@@ -6,6 +6,7 @@
 
     <display-name>Topjava</display-name>
 
+
     <servlet>
         <servlet-name>userServlet</servlet-name>
         <servlet-class>ru.javawebinar.topjava.web.UserServlet</servlet-class>
@@ -25,5 +26,7 @@
         <servlet-name>mealServlet</servlet-name>
         <url-pattern>/meals</url-pattern>
     </servlet-mapping>
+
+
 
 </web-app>
