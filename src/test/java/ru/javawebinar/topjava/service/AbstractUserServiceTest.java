@@ -12,6 +12,7 @@ import ru.javawebinar.topjava.repository.JpaUtil;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.validation.ConstraintViolationException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -26,8 +27,9 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     @Autowired
     private CacheManager cacheManager;
 
-    @Autowired
+    @Autowired(required = false)
     protected JpaUtil jpaUtil;
+
 
     @Before
     public void setUp() throws Exception {
@@ -82,6 +84,9 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
         User updated = new User(USER);
         updated.setName("UpdatedName");
         updated.setCaloriesPerDay(330);
+        List<Role> list = new ArrayList<>();
+        list.add(Role.ROLE_ADMIN);
+        updated.setRoles(list);
         service.update(updated);
         assertMatch(service.get(USER_ID), updated);
     }
@@ -102,7 +107,8 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     }
     @Test
     public void testRole(){
-        User test = service.create(USER);
-        UserTestData.assertMatch(test, USER);
+        User user = new User(null, "User", "user2@yandex.ru", "password", Role.ROLE_USER, Role.ROLE_ADMIN);
+        User test = service.create(user);
+        UserTestData.assertMatch(test, user);
     }
 }

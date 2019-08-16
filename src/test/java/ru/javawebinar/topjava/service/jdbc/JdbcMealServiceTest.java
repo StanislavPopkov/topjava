@@ -1,7 +1,9 @@
 package ru.javawebinar.topjava.service.jdbc;
 
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
+import ru.javawebinar.topjava.repository.JpaUtil;
 import ru.javawebinar.topjava.service.AbstractMealServiceTest;
 
 import javax.validation.ConstraintViolationException;
@@ -18,4 +20,6 @@ public class JdbcMealServiceTest extends AbstractMealServiceTest {
     public void testValidation() throws Exception {
         throw new ConstraintViolationException("тест пройден", null);
     }
+
+
 }
