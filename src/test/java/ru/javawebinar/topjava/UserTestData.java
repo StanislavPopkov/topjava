@@ -16,7 +16,7 @@ public class UserTestData {
     public static final User ADMIN = new User(ADMIN_ID, "Admin", "admin@gmail.com", "admin", Role.ROLE_ADMIN);
 
     public static void assertMatch(User actual, User expected) {
-        assertThat(actual).isEqualToIgnoringGivenFields(expected, "registered", "roles", "meals");
+        assertThat(actual).isEqualToIgnoringGivenFields(expected, "registered", "meals");
     }
 
     public static void assertMatch(Iterable<User> actual, User... expected) {
