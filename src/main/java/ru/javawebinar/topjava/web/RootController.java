@@ -25,7 +25,7 @@ public class RootController {
     }
 
     @GetMapping("/users")
-    public String users(Model model) {
+    public String getUsers(Model model) {
         model.addAttribute("users", userService.getAll());
         return "users";
     }
@@ -38,7 +38,7 @@ public class RootController {
     }
 
     @GetMapping("/meals")
-    public String meals(Model model) {
+    public String getMeals(Model model) {
         model.addAttribute("meals",
                 MealsUtil.getWithExcess(mealService.getAll(SecurityUtil.authUserId()), SecurityUtil.authUserCaloriesPerDay()));
         return "meals";

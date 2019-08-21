@@ -53,7 +53,7 @@ public class JspMealController extends AbstractMealController {
         return "redirect:/meals";
     }
 
-    @PostMapping("/filter")
+    @GetMapping("/filter")
     public String getBetween(HttpServletRequest request, Model model) {
         LocalDate startDate = parseLocalDate(request.getParameter("startDate"));
         LocalDate endDate = parseLocalDate(request.getParameter("endDate"));

@@ -30,7 +30,7 @@ class InMemoryAdminRestControllerSpringTest {
     }
 
     @Test
-    void testDelete() throws Exception {
+    void delete() throws Exception {
         controller.delete(UserTestData.USER_ID);
         Collection<User> users = controller.getAll();
         assertEquals(1, users.size());
@@ -38,7 +38,7 @@ class InMemoryAdminRestControllerSpringTest {
     }
 
     @Test
-    void testDeleteNotFound() throws Exception {
+    void deleteNotFound() throws Exception {
         assertThrows(NotFoundException.class, () ->
                 controller.delete(10));
     }
