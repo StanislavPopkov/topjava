@@ -10,18 +10,16 @@ import ru.javawebinar.topjava.model.User;
 import java.net.URI;
 import java.util.List;
 
-import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
-
 @RestController
 @RequestMapping(value = AdminRestController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 public class AdminRestController extends AbstractUserController {
 
     public static final String REST_URL = "/rest/admin/users";
 
+    @Override
     @GetMapping
     public List<User> getAll() {
-        log.info("getAll");
-        return service.getAll();
+        return super.getAll();
     }
 
     @Override
@@ -32,9 +30,7 @@ public class AdminRestController extends AbstractUserController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> createWithLocation(@RequestBody User user) {
-        log.info("create {}", user);
-        checkNew(user);
-        User created = service.create(user);
+        User created = super.create(user);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(REST_URL + "/{id}")
                 .buildAndExpand(created.getId()).toUri();
