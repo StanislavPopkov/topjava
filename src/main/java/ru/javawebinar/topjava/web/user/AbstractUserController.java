@@ -43,4 +43,8 @@ public abstract class AbstractUserController {
         assureIdConsistent(user, id);
         service.update(user);
     }
+
+    public void checkUser(int id, boolean active){
+        service.changeState(id, active);
+   }
 }

@@ -1,25 +1,18 @@
-// $(document).ready(function () {
 $(function () {
     makeEditable({
-            ajaxUrl: "ajax/admin/users/",
+            ajaxUrl: "ajax/meal/",
             datatableApi: $("#datatable").DataTable({
                 "paging": false,
                 "info": true,
                 "columns": [
                     {
-                        "data": "name"
+                        "data": "dateTime"
                     },
                     {
-                        "data": "email"
+                        "data": "description"
                     },
                     {
-                        "data": "roles"
-                    },
-                    {
-                        "data": "enabled"
-                    },
-                    {
-                        "data": "registered"
+                        "data": "calories"
                     },
                     {
                         "defaultContent": "Edit",
@@ -33,22 +26,26 @@ $(function () {
                 "order": [
                     [
                         0,
-                        "asc"
+                        "desc"
                     ]
                 ]
             })
         }
     );
 });
-
-function checkUser(id) {
-    var isChecked = $("input:checkbox").is(":checked") ? 1:0;
+let context2;
+function filterMeals() {
     $.ajax({
-        url: "ajax/admin/users/check",
-        type: 'POST',
-        data: { id: id, state:isChecked }
-    }).done(function () {
-        updateTable();
-        successNoty("Checked");
+        url: 'ajax/meal/filter?startDate='+$('#startDate').attr("value")+'&startTime='+$('#startTime').attr("value")+'&endDate='+$('#endDate').attr("value")+ '&endTime='+$('#endTime').attr("value"),
+    }).done(function (data) {
+        context.datatableApi.clear().rows.add(data).draw();
+        successNoty("Filtered");
     });
+}
+
+function clearForm(){
+    $('#startDate').val("");
+    $('#startTime').val("");
+    $('#endDate').val("");
+    $('#endTime').val("");
 }

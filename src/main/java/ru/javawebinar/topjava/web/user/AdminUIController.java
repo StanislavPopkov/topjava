@@ -37,4 +37,11 @@ public class AdminUIController extends AbstractUserController {
             super.create(user);
         }
     }
+    //метод для получения значения чекбокса и его изменения
+    @PostMapping("/check")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void  checkUser(@RequestParam("id") int id, @RequestParam("state") int state) {
+        boolean active = (state == 1)? false : true;
+        super.checkUser(id, active);
+    }
 }

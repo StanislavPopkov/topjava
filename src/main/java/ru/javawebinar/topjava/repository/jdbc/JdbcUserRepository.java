@@ -115,4 +115,8 @@ public class JdbcUserRepository implements UserRepository {
         }
         return u;
     }
+    //заглушка
+    @Override
+    public void changeState(int id, boolean active) {
+    }
 }
