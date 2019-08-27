@@ -2,6 +2,7 @@ package ru.javawebinar.topjava.web.user;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.javawebinar.topjava.model.Role;
@@ -12,9 +13,11 @@ import ru.javawebinar.topjava.web.json.JsonUtil;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.javawebinar.topjava.TestUtil.readFromJson;
 import static ru.javawebinar.topjava.TestUtil.userHttpBasic;
 import static ru.javawebinar.topjava.UserTestData.*;
@@ -56,6 +59,14 @@ class AdminRestControllerTest extends AbstractControllerTest {
     void getUnAuth() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(REST_URL))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void loginUser() throws Exception {
+        mockMvc.perform(formLogin("login").user("user@yandex.ru").password("password"))
+                .andExpect( redirectedUrl("http://localhost/login")).andExpect(status().isFound())
+                //.andExpect(redirectedUrl("/meals")).andExpect(status().isFound())
+                .andDo(print());
     }
 
     @Test
