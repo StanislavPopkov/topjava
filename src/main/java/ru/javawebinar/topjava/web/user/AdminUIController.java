@@ -7,7 +7,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.to.UserTo;
-import ru.javawebinar.topjava.util.UserUtil;
 import ru.javawebinar.topjava.util.ValidationUtil;
 
 import javax.validation.Valid;
@@ -42,7 +41,7 @@ public class AdminUIController extends AbstractUserController {
             return ValidationUtil.getErrorResponse(result);
         }
         if (userTo.isNew()) {
-            super.create(UserUtil.createNewFromTo(userTo));
+            super.create(userTo);
         } else {
             super.update(userTo, userTo.id());
         }
