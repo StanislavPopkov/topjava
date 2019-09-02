@@ -11,7 +11,7 @@
 <div class="jumbotron">
     <div class="container text-center">
         <br>
-        <h2><spring:message code="common.appError"/></h2>
+        <h2>${typeMessage}</h2>
         <h3>${message}</h3>
     </div>
 </div>
