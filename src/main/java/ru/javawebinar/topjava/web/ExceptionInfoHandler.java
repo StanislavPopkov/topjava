@@ -37,7 +37,19 @@ public class ExceptionInfoHandler {
     @ResponseStatus(value = HttpStatus.CONFLICT)  // 409
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ErrorInfo conflict(HttpServletRequest req, DataIntegrityViolationException e) {
-        return logAndGetErrorInfo(req, e, true, DATA_ERROR);
+        String path = req.getRequestURI();
+        IllegalRequestDataException exception;
+        if(path.endsWith("users/")){
+            exception = new IllegalRequestDataException("User with this email already exists");
+        }
+        else if(path.endsWith("meals/")){
+            exception = new IllegalRequestDataException("Meal with this data already exists");
+        }
+        else{
+            exception = new IllegalRequestDataException("Other issue");
+        }
+        exception.initCause(e.getCause());
+        return logAndGetErrorInfo(req, exception, true, DATA_ERROR);
     }
 
     @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)  // 422
@@ -60,6 +72,6 @@ public class ExceptionInfoHandler {
         } else {
             log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), rootCause.toString());
         }
-        return new ErrorInfo(req.getRequestURL(), errorType, rootCause.toString());
+        return new ErrorInfo(req.getRequestURL(), errorType, e.toString());
     }
 }
