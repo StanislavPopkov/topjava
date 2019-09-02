@@ -76,7 +76,7 @@ public class ExceptionInfoHandler {
         String[] details = result.getFieldErrors().stream()
                 .map(fe -> {
                     String msg = fe.getDefaultMessage();
-                    return msg == null ? null : (msg.startsWith(fe.getField())) ? msg : fe.getField() + ' ' + msg;
+                    return msg == null ? messageUtil.getMessage(fe) : (msg.startsWith(fe.getField())) ? msg : fe.getField() + ' ' + msg;
                 }).filter(Objects::nonNull)
                 .toArray(String[]::new);
 
